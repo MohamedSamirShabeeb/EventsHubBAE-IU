@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty EventHub & Directory</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#2563eb',
+                            600: '#1d4ed8',
+                            700: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="h-full flex flex-col text-slate-800 antialiased">
+
+    <!-- Top Navigation -->
+    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand / Logo -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="resetFilters()">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+                        <i class="fa-solid fa-graduation-cap text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold bg-gradient-to-r from-brand-700 to-indigo-700 bg-clip-text text-transparent">FacultyHub</span>
+                        <span class="block text-[10px] font-semibold text-slate-400 -mt-1 tracking-wider uppercase">Events & Internships</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Nav Tabs -->
+                <nav class="hidden md:flex items-center space-x-1">
+                    <button onclick="filterByCategory('all')" id="nav-all" class="nav-tab active px-3 py-2 rounded-lg text-sm font-semibold text-brand-600 bg-brand-50 transition">
+                        <i class="fa-solid fa-grid-2 mr-1.5"></i> All Programs
+                    </button>
+                    <button onclick="filterByCategory('Internship')" id="nav-internship" class="nav-tab px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-brand-600 hover:bg-slate-100 transition">
+                        <i class="fa-solid fa-briefcase mr-1.5 text-amber-500"></i> Internships
+                    </button>
+                    <button onclick="filterByCategory('Workshop')" id="nav-workshop" class="nav-tab px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-brand-600 hover:bg-slate-100 transition">
+                        <i class="fa-solid fa-laptop-code mr-1.5 text-indigo-500"></i> Workshops
+                    </button>
+                    <button onclick="filterByCategory('Symposium')" id="nav-symposium" class="nav-tab px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-brand-600 hover:bg-slate-100 transition">
+                        <i class="fa-solid fa-award mr-1.5 text-emerald-500"></i> Symposiums
+                    </button>
+                    <button onclick="scrollToSection('podcasts-section')" class="px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-brand-600 hover:bg-slate-100 transition">
+                        <i class="fa-solid fa-podcast mr-1.5 text-purple-500"></i> Podcasts
+                    </button>
+                    <button onclick="scrollToSection('volunteer-section')" class="px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-brand-600 hover:bg-slate-100 transition">
+                        <i class="fa-solid fa-hand-holding-heart mr-1.5 text-rose-500"></i> Volunteer
+                    </button>
+                </nav>
+
+                <!-- Action Controls -->
+                <div class="flex items-center gap-2">
+                    <button onclick="openTrainersDirectory()" class="px-3 py-2 rounded-lg border border-slate-200 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-users text-brand-600"></i>
+                        <span class="hidden sm:inline">Trainers</span>
+                    </button>
+                    <button onclick="openSponsorsHub()" class="px-3 py-2 rounded-lg border border-slate-200 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-handshake text-emerald-600"></i>
+                        <span class="hidden sm:inline">Sponsors</span>
+                    </button>
+                    <button onclick="openVolunteerModal('general')" class="px-3 py-2 rounded-lg bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs sm:text-sm font-semibold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-heart text-rose-500"></i>
+                        <span class="hidden sm:inline">Volunteer</span>
+                    </button>
+                    <button onclick="openAddEventModal()" class="px-3.5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs sm:text-sm font-semibold shadow-sm transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Add Event</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="bg-gradient-to-b from-brand-900 via-brand-900 to-slate-900 text-white relative overflow-hidden py-10 sm:py-14">
+        <!-- Abstract Glow Graphics -->
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-brand-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="max-w-3xl">
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/20 border border-brand-400/30 text-brand-200 mb-3">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Dean's Academic & Industry Portfolio 2026
+                </span>
+                <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+                    Faculty Training, Research & Summer Internships
+                </h1>
+                <p class="mt-3 text-slate-300 text-sm sm:text-base leading-relaxed">
+                    Explore industry-sponsored programs, faculty research symposiums, hands-on workshops, podcasts, and direct corporate internship pipelines for top student talent.
+                </p>
+
+                <!-- Dynamic Statistics Bar -->
+                <div class="mt-6 grid grid-cols-4 gap-3 max-w-xl bg-white/5 backdrop-blur-sm border border-white/10 p-3 rounded-xl">
+                    <div class="text-center border-r border-white/10">
+                        <div id="stat-events" class="text-xl font-bold text-white">0</div>
+                        <div class="text-[11px] text-slate-400 uppercase tracking-wider font-medium">Programs</div>
+                    </div>
+                    <div class="text-center border-r border-white/10">
+                        <div id="stat-trainers" class="text-xl font-bold text-emerald-400">0</div>
+                        <div class="text-[11px] text-slate-400 uppercase tracking-wider font-medium">Trainers</div>
+                    </div>
+                    <div class="text-center border-r border-white/10">
+                        <div id="stat-sponsors" class="text-xl font-bold text-indigo-300">0</div>
+                        <div class="text-[11px] text-slate-400 uppercase tracking-wider font-medium">Sponsors</div>
+                    </div>
+                    <div class="text-center">
+                        <div id="stat-podcasts" class="text-xl font-bold text-purple-400">0</div>
+                        <div class="text-[11px] text-slate-400 uppercase tracking-wider font-medium">Podcasts</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter and Search Toolbar -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-20">
+        <div class="bg-white rounded-2xl shadow-lg border border-slate-200/80 p-4 sm:p-5">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                
+                <!-- Search Input -->
+                <div class="md:col-span-5 relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="search-input" oninput="applyFilters()" placeholder="Search title, trainer, topic, or key terms..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition">
+                </div>
+
+                <!-- Category Dropdown -->
+                <div class="md:col-span-3">
+                    <select id="category-select" onchange="applyFilters()" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition">
+                        <option value="all">All Categories</option>
+                        <option value="Internship">Summer Internship</option>
+                        <option value="Workshop">Hands-on Workshop</option>
+                        <option value="Training">Professional Training</option>
+                        <option value="Symposium">Faculty Symposium</option>
+                        <option value="Hackathon">Competition & Hackathon</option>
+                    </select>
+                </div>
+
+                <!-- Sponsor Filter Dropdown -->
+                <div class="md:col-span-3">
+                    <select id="sponsor-select" onchange="applyFilters()" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500 transition">
+                        <option value="all">All Sponsors</option>
+                        <!-- Dynamic Options populated by JS -->
+                    </select>
+                </div>
+
+                <!-- Reset Filters Button -->
+                <div class="md:col-span-1 flex justify-end">
+                    <button onclick="resetFilters()" title="Reset Filters" class="w-full md:w-auto px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm font-semibold transition flex items-center justify-center">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Filter Tags -->
+            <div class="flex items-center gap-2 mt-4 overflow-x-auto pb-1 text-xs custom-scrollbar">
+                <span class="text-slate-400 font-semibold uppercase tracking-wider text-[10px] shrink-0">Tags:</span>
+                <button onclick="setSearchQuery('AI')" class="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-brand-50 hover:text-brand-600 text-slate-600 font-medium transition shrink-0">#AI & ML</button>
+                <button onclick="setSearchQuery('Cybersecurity')" class="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-brand-50 hover:text-brand-600 text-slate-600 font-medium transition shrink-0">#Cybersecurity</button>
+                <button onclick="setSearchQuery('Cloud')" class="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-brand-50 hover:text-brand-600 text-slate-600 font-medium transition shrink-0">#Cloud DevOps</button>
+                <button onclick="setSearchQuery('Research')" class="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-brand-50 hover:text-brand-600 text-slate-600 font-medium transition shrink-0">#Faculty Research</button>
+                <button onclick="setSearchQuery('Full Stack')" class="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-brand-50 hover:text-brand-600 text-slate-600 font-medium transition shrink-0">#Full Stack</button>
+                <button onclick="setSearchQuery('Data Science')" class="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-brand-50 hover:text-brand-600 text-slate-600 font-medium transition shrink-0">#Data Science</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        <!-- Results Header -->
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-xl font-bold text-slate-900" id="results-heading">Upcoming Faculty & Student Programs</h2>
+                <p class="text-xs text-slate-500" id="results-count">Showing 0 programs</p>
+            </div>
+            <!-- Export Data Helper -->
+            <button onclick="exportEventsJSON()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition flex items-center gap-1.5" title="Download updated events.json to save or commit to GitHub repository">
+                <i class="fa-solid fa-download text-brand-600"></i>
+                <span>Export Data</span>
+            </button>
+        </div>
+
+        <!-- Events Grid Container -->
+        <div id="events-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Event Cards dynamically rendered here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-16 bg-white rounded-2xl border border-dashed border-slate-300">
+            <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+                <i class="fa-solid fa-calendar-xmark"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-700">No events found</h3>
+            <p class="text-xs text-slate-500 mt-1">Try adjusting your filters or search keywords.</p>
+            <button onclick="resetFilters()" class="mt-4 px-4 py-2 bg-brand-600 text-white rounded-lg text-xs font-semibold hover:bg-brand-700 transition">Reset All Filters</button>
+        </div>
+
+        <!-- SECTION: Faculty Podcasts Feed -->
+        <section id="podcasts-section" class="mt-16 pt-10 border-t border-slate-200">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 mb-2">
+                        <i class="fa-solid fa-podcast"></i> Tech & Academic Discussions
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-slate-900">Faculty Podcast Feed</h2>
+                    <p class="text-xs text-slate-500 mt-1">Listen to insights from top trainers, industry sponsors, and successful intern alumni.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-medium text-slate-400">Listen on:</span>
+                    <a href="https://spotify.com" target="_blank" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 flex items-center justify-center transition" title="Spotify"><i class="fa-brands fa-spotify text-base"></i></a>
+                    <a href="https://apple.com" target="_blank" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-purple-50 text-slate-600 hover:text-purple-600 flex items-center justify-center transition" title="Apple Podcasts"><i class="fa-solid fa-podcast text-base"></i></a>
+                    <a href="https://youtube.com" target="_blank" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 flex items-center justify-center transition" title="YouTube"><i class="fa-brands fa-youtube text-base"></i></a>
+                </div>
+            </div>
+
+            <!-- Audio Sticky Bar Player -->
+            <div id="podcast-player-bar" class="hidden mb-6 p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-indigo-500/30">
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <div class="w-12 h-12 rounded-xl bg-purple-600 flex items-center justify-center text-white shrink-0 text-xl font-bold shadow-lg shadow-purple-500/30">
+                        <i class="fa-solid fa-music"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="text-[10px] font-bold text-purple-300 uppercase tracking-wider">Now Playing</div>
+                        <h4 id="player-title" class="font-bold text-sm truncate">Episode Title</h4>
+                        <p id="player-speaker" class="text-xs text-slate-400 truncate">Speaker Name</p>
+                    </div>
+                </div>
+                <!-- Controls -->
+                <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                    <audio id="audio-element" class="hidden"></audio>
+                    <button onclick="toggleAudioPlay()" id="player-play-btn" class="w-10 h-10 rounded-full bg-purple-500 hover:bg-purple-400 text-white flex items-center justify-center shadow-md transition">
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                    <span id="player-time" class="text-xs font-mono text-slate-300">00:00 / 00:00</span>
+                    <button onclick="closeAudioPlayer()" class="text-slate-400 hover:text-white text-xs ml-2"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+
+            <!-- Podcasts Grid -->
+            <div id="podcasts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+        <!-- SECTION: Volunteer Opportunities & Call To Action -->
+        <section id="volunteer-section" class="mt-16 pt-10 border-t border-slate-200">
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 mb-3">
+                    <i class="fa-solid fa-hand-holding-heart"></i> Get Involved & Contribute
+                </span>
+                <h2 class="text-3xl font-extrabold text-slate-900">Volunteer With FacultyHub</h2>
+                <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+                    Whether you are an industry expert wanting to mentor students, a corporate partner looking to host workshops, or an active student wanting to organize events—we invite you to join us!
+                </p>
+            </div>
+
+            <!-- Volunteer Tracks Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- Track 1: Trainers & Speakers -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-lg transition flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl font-bold mb-4 group-hover:scale-110 transition duration-200">
+                            <i class="fa-solid fa-chalkboard-user"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900">Volunteer as Trainer / Speaker</h3>
+                        <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                            Share your technical expertise by conducting hands-on workshops, guest lectures, or mentoring student capstone projects.
+                        </p>
+                        <ul class="mt-4 text-xs text-slate-600 space-y-2">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Lead interactive tech sessions</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Trainer Profile badge & listing</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Official Faculty Appreciation Certificate</li>
+                        </ul>
+                    </div>
+                    <button onclick="openVolunteerModal('trainer')" class="mt-6 w-full py-2.5 rounded-xl bg-slate-900 hover:bg-brand-600 text-white text-xs font-semibold transition flex items-center justify-center gap-2">
+                        <span>Apply as Trainer</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Track 2: Sponsor & Company Partners -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-lg transition flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold mb-4 group-hover:scale-110 transition duration-200">
+                            <i class="fa-solid fa-building-circle-check"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900">Partner / Company Sponsor</h3>
+                        <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                            Sponsor upcoming training events, offer summer internship slots, or provide cloud credits and learning resources for students.
+                        </p>
+                        <ul class="mt-4 text-xs text-slate-600 space-y-2">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Direct talent recruitment pipeline</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Brand placement on event banners</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Host company hackathons</li>
+                        </ul>
+                    </div>
+                    <button onclick="openVolunteerModal('company')" class="mt-6 w-full py-2.5 rounded-xl bg-slate-900 hover:bg-emerald-600 text-white text-xs font-semibold transition flex items-center justify-center gap-2">
+                        <span>Partner With Us</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Track 3: Join Our Team (Students & Faculty) -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-lg transition flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl font-bold mb-4 group-hover:scale-110 transition duration-200">
+                            <i class="fa-solid fa-users-gear"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900">Join Our Organizing Team</h3>
+                        <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                            Become an active member of our organizing crew! Opportunities in Event Management, Media & Design, Technical Support, and PR.
+                        </p>
+                        <ul class="mt-4 text-xs text-slate-600 space-y-2">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Leadership & Management experience</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> VIP access to all workshops & guests</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Recommendation letters for top team members</li>
+                        </ul>
+                    </div>
+                    <button onclick="openVolunteerModal('team')" class="mt-6 w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition flex items-center justify-center gap-2">
+                        <span>Join Team Crew</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION: Official Sponsors & Industry Partners Banner -->
+        <section id="sponsors-banner-section" class="mt-16 pt-10 border-t border-slate-200">
+            <div class="text-center max-w-3xl mx-auto mb-8">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 mb-3">
+                    <i class="fa-solid fa-handshake"></i> Industry Ecosystem
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Our Official Corporate & Academic Partners</h2>
+                <p class="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    Click on any sponsor logo below to view their company profile, social media channels, and all sponsored workshops & summer internships.
+                </p>
+            </div>
+
+            <!-- Sponsor Logos Grid / Banner -->
+            <div id="sponsors-banner-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4 items-center">
+                <!-- Dynamically rendered sponsor cards / logos via JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-8 border-t border-slate-800 text-xs mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded bg-brand-600 text-white flex items-center justify-center text-xs font-bold">FH</div>
+                <span class="text-slate-200 font-semibold">Faculty Event Directory Hub</span>
+                <span>&copy; 2026 Ready for Dean's Review & Deployment</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="scrollToSection('podcasts-section')" class="hover:text-white transition">Podcasts</button>
+                <button onclick="openVolunteerModal('general')" class="hover:text-white transition">Volunteer</button>
+                <button onclick="openTrainersDirectory()" class="hover:text-white transition">Trainers Directory</button>
+                <button onclick="openSponsorsHub()" class="hover:text-white transition">Sponsor Partners</button>
+                <button onclick="openAddEventModal()" class="hover:text-white transition">Admin Portal</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL 1: Detailed Event View -->
+    <div id="event-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl border border-slate-100 flex flex-col">
+            <!-- Modal Header -->
+            <div id="modal-event-banner" class="p-6 bg-gradient-to-r from-brand-900 to-slate-900 text-white relative">
+                <button onclick="closeModal('event-modal')" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <div id="modal-category-badge" class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-500 text-white mb-2"></div>
+                <h2 id="modal-event-title" class="text-xl sm:text-2xl font-bold"></h2>
+                <div class="flex flex-wrap items-center gap-4 mt-3 text-xs text-slate-300">
+                    <span id="modal-event-date"><i class="fa-regular fa-calendar mr-1 text-brand-400"></i> </span>
+                    <span id="modal-event-time"><i class="fa-regular fa-clock mr-1 text-brand-400"></i> </span>
+                    <span id="modal-event-location"><i class="fa-solid fa-location-dot mr-1 text-brand-400"></i> </span>
+                </div>
+            </div>
+
+            <!-- Modal Body Content -->
+            <div class="p-6 space-y-6">
+                <!-- Sponsor Banner inside modal -->
+                <div id="modal-sponsor-card" class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div id="modal-sponsor-logo" class="w-12 h-12 rounded-lg bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-700 text-lg shadow-sm"></div>
+                        <div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Official Partner / Sponsor</div>
+                            <div id="modal-sponsor-name" class="font-bold text-slate-800 text-sm"></div>
+                            <div id="modal-sponsor-tier" class="text-xs text-emerald-600 font-medium"></div>
+                        </div>
+                    </div>
+                    <button id="modal-sponsor-btn" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition">View Partner</button>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">About Program</h4>
+                    <p id="modal-event-desc" class="text-sm text-slate-700 leading-relaxed"></p>
+                </div>
+
+                <!-- Agenda / Perks -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-700 mb-2"><i class="fa-solid fa-list-check mr-1"></i> Program Highlights</h4>
+                        <ul id="modal-event-highlights" class="text-xs text-slate-700 space-y-1.5 list-disc pl-4"></ul>
+                    </div>
+                    <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-2"><i class="fa-solid fa-award mr-1"></i> Prerequisites & Perks</h4>
+                        <p id="modal-event-perks" class="text-xs text-slate-700 leading-relaxed"></p>
+                    </div>
+                </div>
+
+                <!-- Trainer Section -->
+                <div id="modal-trainer-section" class="p-4 rounded-xl bg-slate-900 text-white flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <img id="modal-trainer-avatar" class="w-12 h-12 rounded-full object-cover border-2 border-brand-500" src="" alt="Trainer">
+                        <div>
+                            <div class="text-[10px] font-bold text-brand-400 uppercase tracking-wider">Lead Instructor / Faculty Lead</div>
+                            <div id="modal-trainer-name" class="font-bold text-sm"></div>
+                            <div id="modal-trainer-role" class="text-xs text-slate-400"></div>
+                        </div>
+                    </div>
+                    <button id="modal-trainer-btn" class="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold transition">Trainer Bio</button>
+                </div>
+            </div>
+
+            <!-- Modal Footer Actions -->
+            <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3">
+                <button onclick="downloadICS()" class="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-semibold transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-calendar-plus text-brand-600"></i> Add to Calendar
+                </button>
+                <div class="flex items-center gap-2">
+                    <button onclick="closeModal('event-modal')" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-200 text-xs font-semibold transition">Close</button>
+                    <a id="modal-register-btn" href="#" target="_blank" class="px-5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold transition shadow-md shadow-brand-500/20">Register / Apply Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Trainer Profile View Modal -->
+    <div id="trainer-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden relative">
+            <button onclick="closeModal('trainer-modal')" class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="p-6 text-center bg-gradient-to-b from-brand-50 to-white pt-8">
+                <img id="trainer-bio-avatar" class="w-24 h-24 rounded-full object-cover mx-auto border-4 border-white shadow-lg mb-3" src="" alt="Trainer">
+                <h3 id="trainer-bio-name" class="text-xl font-bold text-slate-900"></h3>
+                <p id="trainer-bio-title" class="text-xs font-semibold text-brand-600 mt-0.5"></p>
+                <p id="trainer-bio-org" class="text-xs text-slate-500 mt-0.5"></p>
+
+                <!-- Social Links Grid -->
+                <div id="trainer-bio-socials" class="flex items-center justify-center gap-3 mt-4">
+                    <!-- Links injected here dynamically -->
+                </div>
+            </div>
+            <div class="p-6 space-y-4 border-t border-slate-100">
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Biography & Expertise</h4>
+                    <p id="trainer-bio-text" class="text-xs text-slate-600 leading-relaxed"></p>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Specializations</h4>
+                    <div id="trainer-bio-skills" class="flex flex-wrap gap-1.5">
+                        <!-- Skill badges injected -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Trainers Directory List -->
+    <div id="trainers-directory-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[85vh] overflow-y-auto custom-scrollbar shadow-2xl p-6">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Faculty & Guest Trainer Directory</h3>
+                    <p class="text-xs text-slate-500">Certified industry leaders and faculty mentors</p>
+                </div>
+                <button onclick="closeModal('trainers-directory-modal')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="trainers-list-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: Sponsors Hub Modal -->
+    <div id="sponsors-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[85vh] overflow-y-auto custom-scrollbar shadow-2xl p-6">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Sponsor & Partner Directory</h3>
+                    <p class="text-xs text-slate-500">Industry organizations funding summer internships, labs, and training programs</p>
+                </div>
+                <button onclick="closeModal('sponsors-modal')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="sponsors-list-grid" class="space-y-4">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: Add Event Form Modal (Admin Portal - Fixed & Complete) -->
+    <div id="add-event-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl p-6">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Add New Program / Event</h3>
+                    <p class="text-xs text-slate-500">Instantly publish new events for faculty, workshops, or internship listings</p>
+                </div>
+                <button onclick="closeModal('add-event-modal')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="add-event-form" onsubmit="handleCreateEvent(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Event / Program Title *</label>
+                    <input type="text" id="form-title" required placeholder="e.g. Dean's Annual Faculty Research Symposium" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Category *</label>
+                        <select id="form-category" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                            <option value="Internship">Summer Internship</option>
+                            <option value="Workshop">Hands-on Workshop</option>
+                            <option value="Training">Professional Training</option>
+                            <option value="Symposium">Faculty Symposium</option>
+                            <option value="Hackathon">Competition & Hackathon</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Official Sponsor / Partner *</label>
+                        <select id="form-sponsor" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Date Range / Date *</label>
+                        <input type="text" id="form-date" required placeholder="e.g. Oct 24 - Oct 25, 2026" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Time *</label>
+                        <input type="text" id="form-time" required placeholder="e.g. 10:00 AM - 02:00 PM" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Location / Venue *</label>
+                        <input type="text" id="form-location" required placeholder="e.g. Main Campus Hall A" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Lead Trainer / Instructor *</label>
+                        <select id="form-trainer" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Description *</label>
+                    <textarea id="form-desc" rows="3" required placeholder="Provide a brief summary of the program objective and target audience..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg"></textarea>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Registration / Application URL</label>
+                    <input type="url" id="form-link" placeholder="https://forms.google.com/..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                </div>
+
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+                    <button type="button" onclick="closeModal('add-event-modal')" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg font-semibold hover:bg-slate-200">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-600 text-white rounded-lg font-semibold hover:bg-brand-700 shadow-md">Publish Program</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 6: Volunteer Application Modal -->
+    <div id="volunteer-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl p-6">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900" id="volunteer-modal-title">Volunteer Application</h3>
+                    <p class="text-xs text-slate-500">Select your role and submit your details to join the FacultyHub community.</p>
+                </div>
+                <button onclick="closeModal('volunteer-modal')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+    <!-- MODAL 7: Dedicated Sponsor Profile & Events Modal -->
+    <div id="sponsor-detail-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl border border-slate-100 flex flex-col relative overflow-hidden">
+            <button onclick="closeModal('sponsor-detail-modal')" class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="p-6 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white">
+                <div class="flex items-center gap-4">
+                    <div id="sponsor-detail-logo" class="w-16 h-16 rounded-2xl bg-white text-slate-900 font-extrabold text-2xl flex items-center justify-center shrink-0 shadow-lg border border-slate-200"></div>
+                    <div>
+                        <span id="sponsor-detail-tier" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500 text-white"></span>
+                        <h3 id="sponsor-detail-name" class="text-xl font-bold mt-1"></h3>
+                        <p id="sponsor-detail-internships" class="text-xs text-slate-300 mt-1 flex items-center gap-1.5">
+                            <i class="fa-solid fa-briefcase text-emerald-400"></i>
+                            <span>0 Summer Internship Slots Offered</span>
+                        </p>
+                    </div>
+                </div>
+                <!-- Social Media Links -->
+                <div id="sponsor-detail-socials" class="flex items-center gap-2 mt-4 pt-3 border-t border-white/10">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+            <div class="p-6 space-y-5">
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">About Organization</h4>
+                    <p id="sponsor-detail-desc" class="text-xs text-slate-600 leading-relaxed"></p>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Sponsored Events & Programs</h4>
+                    <div id="sponsor-detail-events" class="space-y-2">
+                        <!-- Injected sponsored events cards -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+                <a id="sponsor-detail-webbtn" href="#" target="_blank" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-brand-600 text-white text-xs font-semibold transition flex items-center gap-1.5">
+                    <span>Visit Official Website</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                </a>
+                <button onclick="closeModal('sponsor-detail-modal')" class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast Banner -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 border border-slate-700 text-xs transition transform translate-y-2">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toast-msg">Action completed successfully.</span>
+    </div>
+
+    <script>
+        // Default Podcasts Data
+        const INITIAL_PODCASTS = [
+            {
+                id: 'p1',
+                title: 'Ep 01: Landing Your First Summer AI Internship',
+                speaker: 'Dr. Sarah Al-Mansoor & TechCorp Recruiter',
+                duration: '24 min',
+                date: 'Sep 15, 2026',
+                topic: 'Career Advice',
+                audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+                summary: 'Discussion on what top tech companies look for in student faculty resumes, essential coding projects, and interview preparation tips.'
+            },
+            {
+                id: 'p2',
+                title: 'Ep 02: Demystifying Kubernetes & Cloud Infrastructure',
+                speaker: 'Eng. Omar Hassan',
+                duration: '32 min',
+                date: 'Sep 20, 2026',
+                topic: 'DevOps & Cloud',
+                audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+                summary: 'A deep dive into how modern cloud DevOps pipelines operate and why container orchestration is a vital skill for computing graduates.'
+            },
+            {
+                id: 'p3',
+                title: 'Ep 03: Ethical Hacking & Modern Cybersecurity Careers',
+                speaker: 'Prof. Youssef Nabil',
+                duration: '28 min',
+                date: 'Sep 25, 2026',
+                topic: 'Cybersecurity',
+                audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+                summary: 'Exploring red teaming vs blue teaming, CTF competitions, and entry pathways into information security careers.'
+            }
+        ];
+
+        // Default Trainers Data
+        const INITIAL_TRAINERS = [
+            {
+                id: 't1',
+                name: 'Dr. Sarah Al-Mansoor',
+                title: 'Associate Professor of Computer Science',
+                organization: 'Faculty of Artificial Intelligence',
+                bio: 'Dr. Sarah has 12+ years of academic research and industry experience leading Deep Learning projects for autonomous systems and NLP.',
+                avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=250',
+                skills: ['Artificial Intelligence', 'PyTorch', 'Computer Vision', 'Data Science'],
+                socials: {
+                    linkedin: 'https://linkedin.com',
+                    github: 'https://github.com',
+                    twitter: 'https://x.com',
+                    website: 'https://google.com'
+                }
+            },
+            {
+                id: 't2',
+                name: 'Eng. Omar Hassan',
+                title: 'Principal Cloud Solution Architect',
+                organization: 'AWS Certified Trainer & Tech Lead',
+                bio: 'Specializing in DevOps pipelines, Kubernetes orchestrations, and cloud architecture optimizations for Fortune 500 enterprises.',
+                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250',
+                skills: ['AWS', 'Docker & K8s', 'CI/CD Pipelines', 'Cybersecurity'],
+                socials: {
+                    linkedin: 'https://linkedin.com',
+                    github: 'https://github.com',
+                    twitter: 'https://x.com'
+                }
+            },
+            {
+                id: 't3',
+                name: 'Prof. Youssef Nabil',
+                title: 'Head of Cybersecurity Lab',
+                organization: 'Faculty Cyber Defense Initiative',
+                bio: 'Lead researcher in ethical hacking, penetration testing methodologies, zero-trust architectures, and cryptography defense mechanisms.',
+                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250',
+                skills: ['Penetration Testing', 'Network Security', 'Ethical Hacking', 'SOC'],
+                socials: {
+                    linkedin: 'https://linkedin.com',
+                    github: 'https://github.com'
+                }
+            },
+            {
+                id: 't4',
+                name: 'Dean Dr. Mahmoud Ibrahim',
+                title: 'Dean of Faculty of Computing & IT',
+                organization: 'University Leadership Board',
+                bio: 'Pioneering academic transformation, fostering faculty-industry partnerships, and driving student innovation research grants.',
+                avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=250',
+                skills: ['Academic Leadership', 'AI Ethics', 'Research Grants', 'Industry Partnerships'],
+                socials: {
+                    linkedin: 'https://linkedin.com',
+                    website: 'https://google.com'
+                }
+            }
+        ];
+
+        // Default Sponsors Data (Updated with Social Media Accounts)
+        const INITIAL_SPONSORS = [
+            {
+                id: 's1',
+                name: 'TechCorp Global',
+                tier: 'Platinum Sponsor',
+                logo: 'TC',
+                description: 'Leading global provider of AI hardware solutions, cloud computing infrastructure, and university research funding.',
+                website: 'https://example.com',
+                internshipsOffered: 15,
+                socials: {
+                    linkedin: 'https://linkedin.com',
+                    twitter: 'https://x.com',
+                    github: 'https://github.com',
+                    website: 'https://example.com'
+                }
+            },
+            {
+                id: 's2',
+                name: 'CyberShield Systems',
+                tier: 'Gold Sponsor',
+                logo: 'CS',
+                description: 'Pioneers in enterprise threat intelligence, threat hunting, and security operation centers.',
+                website: 'https://example.com',
+                internshipsOffered: 8,
+                socials: {
+                    linkedin: 'https://linkedin.com',
+                    twitter: 'https://x.com',
+                    website: 'https://example.com'
+                }
+            },
+            {
+                id: 's3',
+                name: 'InnovateX Labs',
+                tier: 'Silver Sponsor',
+                logo: 'IX',
+                description: 'Venture studio backing top university talent in web engineering, full stack development, and mobile tech.',
+                website: 'https://example.com',
+                internshipsOffered: 10,
+                socials: {
+                    linkedin: 'https://linkedin.com',
+                    github: 'https://github.com',
+                    website: 'https://example.com'
+                }
+            },
+            {
+                id: 's4',
+                name: 'Faculty Dean Office',
+                tier: 'Academic Sponsor',
+                logo: 'FD',
+                description: 'Faculty Administration Office funding internal undergraduate research, student hackathons, and teaching labs.',
+                website: 'https://example.com',
+                internshipsOffered: 5,
+                socials: {
+                    linkedin: 'https://linkedin.com',
+                    website: 'https://example.com'
+                }
+            }
+        ];
+
+        // Full Restored & Expanded Events Dataset (Dean-Ready)
+        const INITIAL_EVENTS = [
+            {
+                id: 'e1',
+                title: 'Summer 2026 AI & Machine Learning Fellowship',
+                category: 'Internship',
+                date: 'Jul 01 - Aug 30, 2026',
+                time: 'Full-time / Hybrid',
+                location: 'TechCorp Innovation Hub & Remote',
+                desc: 'An intensive 8-week summer internship sponsored by TechCorp Global. Selected faculty students will build production ML pipelines, train neural models, and present capstone projects directly to industry executives.',
+                highlights: [
+                    'Monthly stipend provided for all selected interns',
+                    'Direct 1-on-1 mentorship from TechCorp Senior AI Engineers',
+                    'Fast-track offer for full-time employment upon graduation'
+                ],
+                perks: 'Requires Python proficiency, linear algebra foundations, and minimum GPA 3.2.',
+                trainerId: 't1',
+                sponsorId: 's1',
+                regUrl: 'https://forms.google.com'
+            },
+            {
+                id: 'e2',
+                title: 'Hands-on Cloud DevOps & Kubernetes Bootcamp',
+                category: 'Workshop',
+                date: 'Oct 12, 2026',
+                time: '09:00 AM - 03:00 PM',
+                location: 'Faculty Computer Lab 4',
+                desc: 'Learn how to containerize microservices using Docker, configure Helm charts, and establish automated deployment pipelines using GitHub Actions and AWS EKS.',
+                highlights: [
+                    'Deploy live web microservice to production cloud',
+                    'Free $100 AWS Cloud Credits for every attendee',
+                    'Official Faculty Certificate of Hands-on Completion'
+                ],
+                perks: 'Bring your laptop with Docker Desktop pre-installed.',
+                trainerId: 't2',
+                sponsorId: 's1',
+                regUrl: 'https://forms.google.com'
+            },
+            {
+                id: 'e3',
+                title: 'Ethical Hacking & Threat Defense Training',
+                category: 'Training',
+                date: 'Nov 05 - Nov 07, 2026',
+                time: '04:00 PM - 07:00 PM',
+                location: 'Auditorium B & Live Stream',
+                desc: 'Sponsored by CyberShield Systems, this 3-day training covers real-world web vulnerability exploitation, red teaming basics, and OWASP Top 10 mitigation.',
+                highlights: [
+                    'Live CTF (Capture The Flag) Competition on Day 3',
+                    'Access to CyberShield interactive virtual lab environment',
+                    'Direct interview slot with CyberShield HR for top 3 CTF winners'
+                ],
+                perks: 'Open to 3rd and 4th year Computer Science & IT students.',
+                trainerId: 't3',
+                sponsorId: 's2',
+                regUrl: 'https://forms.google.com'
+            },
+            {
+                id: 'e4',
+                title: 'Dean’s Annual Faculty Innovation & Research Symposium 2026',
+                category: 'Symposium',
+                date: 'Dec 10, 2026',
+                time: '09:00 AM - 05:00 PM',
+                location: 'Main Conference Center Hall A',
+                desc: 'The annual flagship faculty gathering showcasing student capstone projects, faculty AI research grants, and keynote presentations from leading industry executives.',
+                highlights: [
+                    'Keynote address by the Dean & Tech Industry Partners',
+                    '$5,000 Innovation Grant award for top faculty student project',
+                    'Poster showcase & industry recruitment networking reception'
+                ],
+                perks: 'Open to all faculty members, students, and invited external guests.',
+                trainerId: 't4',
+                sponsorId: 's4',
+                regUrl: 'https://forms.google.com'
+            },
+            {
+                id: 'e5',
+                title: 'InnovateX 24-Hour Student Hackathon Challenge',
+                category: 'Hackathon',
+                date: 'Nov 20 - Nov 21, 2026',
+                time: '24 Hours Non-Stop',
+                location: 'Faculty Student Center & Maker Lab',
+                desc: 'Build impactful real-world software applications, AI agents, or fintech prototypes in 24 hours! Sponsored by InnovateX Labs with mentorship on site.',
+                highlights: [
+                    'Cash prizes for top 3 winning teams ($3,000 pool)',
+                    'Free meals, coffee, and developer swag kits',
+                    'Incubation & funding offer for top prototype startup'
+                ],
+                perks: 'Teams of 2 to 4 students. Cross-departmental teams encouraged.',
+                trainerId: 't2',
+                sponsorId: 's3',
+                regUrl: 'https://forms.google.com'
+            },
+            {
+                id: 'e6',
+                title: 'Full Stack Web Architecture & React Masterclass',
+                category: 'Workshop',
+                date: 'Oct 28, 2026',
+                time: '01:00 PM - 05:00 PM',
+                location: 'Computer Lab 2 & Online Zoom',
+                desc: 'Master full stack web development using modern React, Tailwind CSS, Node.js, and serverless API integration. Perfect for students preparing capstone projects.',
+                highlights: [
+                    'Build a complete full stack web application from scratch',
+                    'Deploy live to Vercel/GitHub Pages during workshop',
+                    'Source code templates and project starter kits provided'
+                ],
+                perks: 'Basic JavaScript knowledge recommended.',
+                trainerId: 't1',
+                sponsorId: 's3',
+                regUrl: 'https://forms.google.com'
+            }
+        ];
+
+        // App State Management
+        let trainers = JSON.parse(localStorage.getItem('fh_trainers')) || INITIAL_TRAINERS;
+        let sponsors = JSON.parse(localStorage.getItem('fh_sponsors')) || INITIAL_SPONSORS;
+        let events = JSON.parse(localStorage.getItem('fh_events')) || INITIAL_EVENTS;
+        let podcasts = JSON.parse(localStorage.getItem('fh_podcasts')) || INITIAL_PODCASTS;
+        let currentModalEvent = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            populateSponsorDropdowns();
+            populateTrainerDropdowns();
+            renderEvents();
+            renderPodcasts();
+            renderSponsorsBanner();
+            updateStatistics();
+        });
+
+        function saveState() {
+            localStorage.setItem('fh_trainers', JSON.stringify(trainers));
+            localStorage.setItem('fh_sponsors', JSON.stringify(sponsors));
+            localStorage.setItem('fh_events', JSON.stringify(events));
+            localStorage.setItem('fh_podcasts', JSON.stringify(podcasts));
+            updateStatistics();
+            renderSponsorsBanner();
+        }
+
+        function renderSponsorsBanner() {
+            const container = document.getElementById('sponsors-banner-grid');
+            if (!container) return;
+            container.innerHTML = '';
+
+            sponsors.forEach(s => {
+                const sponsoredCount = events.filter(e => e.sponsorId === s.id).length;
+
+                const cardHtml = `
+                    <div onclick="openSponsorDetail('${s.id}')" class="p-4 rounded-2xl bg-white border border-slate-200/80 hover:border-emerald-500 shadow-sm hover:shadow-lg transition duration-200 cursor-pointer group flex flex-col items-center text-center">
+                        <div class="w-14 h-14 rounded-2xl bg-slate-900 text-white font-extrabold text-xl flex items-center justify-center mb-3 group-hover:scale-105 transition shadow-md shadow-slate-900/10">
+                            ${s.logo}
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-sm group-hover:text-emerald-600 transition truncate w-full">${s.name}</h4>
+                        <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full mt-1">${s.tier}</span>
+                        <div class="mt-3 flex items-center gap-2 text-[10px] text-slate-500 font-medium">
+                            <span><i class="fa-solid fa-calendar-check text-indigo-500 mr-1"></i>${sponsoredCount} Events</span>
+                            <span>•</span>
+                            <span><i class="fa-solid fa-briefcase text-emerald-500 mr-1"></i>${s.internshipsOffered} Slots</span>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        function openSponsorDetail(sponsorId) {
+            const sponsor = sponsors.find(s => s.id === sponsorId);
+            if (!sponsor) return;
+
+            document.getElementById('sponsor-detail-logo').innerText = sponsor.logo || 'SP';
+            document.getElementById('sponsor-detail-name').innerText = sponsor.name;
+            document.getElementById('sponsor-detail-tier').innerText = sponsor.tier;
+            document.getElementById('sponsor-detail-internships').innerHTML = `<i class="fa-solid fa-briefcase text-emerald-400"></i> <span>${sponsor.internshipsOffered} Summer Internship Slots Offered</span>`;
+            document.getElementById('sponsor-detail-desc').innerText = sponsor.description;
+            document.getElementById('sponsor-detail-webbtn').href = sponsor.website || '#';
+
+            // Render Socials
+            const socialsContainer = document.getElementById('sponsor-detail-socials');
+            socialsContainer.innerHTML = '<span class="text-xs text-slate-400 font-semibold mr-1">Connect:</span>';
+            const soc = sponsor.socials || {};
+            
+            if (soc.linkedin) {
+                socialsContainer.innerHTML += `<a href="${soc.linkedin}" target="_blank" class="w-7 h-7 rounded-full bg-white/10 hover:bg-brand-600 text-white flex items-center justify-center text-xs transition"><i class="fa-brands fa-linkedin-in"></i></a>`;
+            }
+            if (soc.twitter) {
+                socialsContainer.innerHTML += `<a href="${soc.twitter}" target="_blank" class="w-7 h-7 rounded-full bg-white/10 hover:bg-sky-500 text-white flex items-center justify-center text-xs transition"><i class="fa-brands fa-x-twitter"></i></a>`;
+            }
+            if (soc.github) {
+                socialsContainer.innerHTML += `<a href="${soc.github}" target="_blank" class="w-7 h-7 rounded-full bg-white/10 hover:bg-slate-800 text-white flex items-center justify-center text-xs transition"><i class="fa-brands fa-github"></i></a>`;
+            }
+            if (soc.website || sponsor.website) {
+                socialsContainer.innerHTML += `<a href="${soc.website || sponsor.website}" target="_blank" class="w-7 h-7 rounded-full bg-white/10 hover:bg-emerald-500 text-white flex items-center justify-center text-xs transition"><i class="fa-solid fa-globe"></i></a>`;
+            }
+
+            // Render Sponsored Events
+            const eventsContainer = document.getElementById('sponsor-detail-events');
+            eventsContainer.innerHTML = '';
+            const sponsoredEvents = events.filter(e => e.sponsorId === sponsor.id);
+
+            if (sponsoredEvents.length === 0) {
+                eventsContainer.innerHTML = `<p class="text-xs text-slate-400 italic">No scheduled events for this sponsor at the moment.</p>`;
+            } else {
+                sponsoredEvents.forEach(ev => {
+                    const itemHtml = `
+                        <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between hover:bg-white transition">
+                            <div>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-100 text-brand-800">${ev.category}</span>
+                                <h5 class="font-bold text-slate-900 text-xs mt-1">${ev.title}</h5>
+                                <p class="text-[11px] text-slate-500 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i>${ev.date}</p>
+                            </div>
+                            <button onclick="closeModal('sponsor-detail-modal'); openEventDetails('${ev.id}');" class="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-[11px] font-semibold transition shrink-0 ml-2">
+                                View Event
+                            </button>
+                        </div>
+                    `;
+                    eventsContainer.innerHTML += itemHtml;
+                });
+            }
+
+            openModal('sponsor-detail-modal');
+        }
+
+        function updateStatistics() {
+            document.getElementById('stat-events').innerText = events.length;
+            document.getElementById('stat-trainers').innerText = trainers.length;
+            document.getElementById('stat-sponsors').innerText = sponsors.length;
+            if (document.getElementById('stat-podcasts')) {
+                document.getElementById('stat-podcasts').innerText = podcasts.length;
+            }
+        }
+
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function renderPodcasts() {
+            const grid = document.getElementById('podcasts-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            podcasts.forEach(p => {
+                const card = `
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800">
+                                    <i class="fa-solid fa-tag mr-1"></i> ${p.topic}
+                                </span>
+                                <span class="text-xs text-slate-400 font-mono"><i class="fa-regular fa-clock mr-1"></i>${p.duration}</span>
+                            </div>
+                            <h3 class="font-bold text-slate-900 text-base leading-snug">${p.title}</h3>
+                            <p class="text-xs font-semibold text-brand-600 mt-1"><i class="fa-solid fa-microphone mr-1"></i> ${p.speaker}</p>
+                            <p class="text-xs text-slate-500 mt-2 line-clamp-3 leading-relaxed">${p.summary}</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                            <span class="text-[11px] text-slate-400">${p.date}</span>
+                            <button onclick="playPodcast('${p.id}')" class="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-play text-[10px]"></i> Listen Episode
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += card;
+            });
+        }
+
+        function playPodcast(podcastId) {
+            const pod = podcasts.find(p => p.id === podcastId);
+            if (!pod) return;
+
+            const bar = document.getElementById('podcast-player-bar');
+            const titleEl = document.getElementById('player-title');
+            const speakerEl = document.getElementById('player-speaker');
+            const audioEl = document.getElementById('audio-element');
+
+            titleEl.innerText = pod.title;
+            speakerEl.innerText = pod.speaker;
+            audioEl.src = pod.audioUrl;
+            bar.classList.remove('hidden');
+
+            audioEl.play().catch(() => {});
+            updatePlayBtnIcon(true);
+
+            audioEl.ontimeupdate = () => {
+                const cur = formatTime(audioEl.currentTime);
+                const dur = formatTime(audioEl.duration || 0);
+                document.getElementById('player-time').innerText = `${cur} / ${dur}`;
+            };
+            audioEl.onended = () => {
+                updatePlayBtnIcon(false);
+            };
+
+            showToast(`Now playing: ${pod.title}`);
+        }
+
+        function toggleAudioPlay() {
+            const audioEl = document.getElementById('audio-element');
+            if (audioEl.paused) {
+                audioEl.play();
+                updatePlayBtnIcon(true);
+            } else {
+                audioEl.pause();
+                updatePlayBtnIcon(false);
+            }
+        }
+
+        function updatePlayBtnIcon(isPlaying) {
+            const btn = document.getElementById('player-play-btn');
+            btn.innerHTML = isPlaying ? '<i class="fa-solid fa-pause"></i>' : '<i class="fa-solid fa-play"></i>';
+        }
+
+        function closeAudioPlayer() {
+            const audioEl = document.getElementById('audio-element');
+            audioEl.pause();
+            document.getElementById('podcast-player-bar').classList.add('hidden');
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "00:00";
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        function openVolunteerModal(role) {
+            switchVolunteerRole(role === 'general' ? 'trainer' : role);
+            openModal('volunteer-modal');
+        }
+
+        function switchVolunteerRole(role) {
+            document.getElementById('vol-role-type').value = role;
+
+            ['trainer', 'company', 'team'].forEach(r => {
+                const tab = document.getElementById(`vol-tab-${r}`);
+                if (r === role) {
+                    tab.className = "vol-role-tab py-2 rounded-lg text-center transition bg-white text-slate-900 shadow-sm";
+                } else {
+                    tab.className = "vol-role-tab py-2 rounded-lg text-center transition text-slate-500 hover:text-slate-800";
+                }
+            });
+
+            const dynamicContainer = document.getElementById('vol-dynamic-field');
+            if (role === 'trainer') {
+                document.getElementById('volunteer-modal-title').innerText = "Volunteer as Trainer / Speaker";
+                dynamicContainer.innerHTML = `
+                    <label class="block font-bold text-slate-700 mb-1">Topics / Expertise Specialization *</label>
+                    <input type="text" id="vol-extra" required placeholder="e.g. AI & ML, React Native, Cybersecurity, Cloud Architecture" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                `;
+            } else if (role === 'company') {
+                document.getElementById('volunteer-modal-title').innerText = "Partner / Company Sponsorship";
+                dynamicContainer.innerHTML = `
+                    <label class="block font-bold text-slate-700 mb-1">Offered Opportunity / Sponsorship Type *</label>
+                    <select id="vol-extra" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                        <option value="Summer Internship Positions">Summer Internship Positions</option>
+                        <option value="Event Financial Sponsor">Event Financial Sponsor</option>
+                        <option value="Cloud Credits & Tech Licenses">Cloud Credits & Tech Licenses</option>
+                        <option value="Hackathon Partner">Hackathon Partner</option>
+                    </select>
+                `;
+            } else if (role === 'team') {
+                document.getElementById('volunteer-modal-title').innerText = "Join Our Team Crew";
+                dynamicContainer.innerHTML = `
+                    <label class="block font-bold text-slate-700 mb-1">Preferred Team Role *</label>
+                    <select id="vol-extra" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                        <option value="Event Operations & Logistics">Event Operations & Logistics</option>
+                        <option value="Media, Graphic Design & Video">Media, Graphic Design & Video</option>
+                        <option value="Tech & Web Developer">Tech & Web Developer</option>
+                        <option value="Public Relations & Sponsor Outreach">Public Relations & Sponsor Outreach</option>
+                    </select>
+                `;
+            }
+        }
+
+        function handleVolunteerSubmit(e) {
+            e.preventDefault();
+            const role = document.getElementById('vol-role-type').value;
+            const name = document.getElementById('vol-name').value;
+
+            closeModal('volunteer-modal');
+            document.getElementById('volunteer-form').reset();
+
+            showToast(`Thank you, ${name}! Your application for ${role.toUpperCase()} track has been received.`);
+        }
+
+        function renderEvents() {
+            const grid = document.getElementById('events-grid');
+            const emptyState = document.getElementById('empty-state');
+            const searchVal = document.getElementById('search-input').value.toLowerCase().trim();
+            const categoryVal = document.getElementById('category-select').value;
+            const sponsorVal = document.getElementById('sponsor-select').value;
+
+            grid.innerHTML = '';
+
+            const filtered = events.filter(ev => {
+                const matchesCategory = (categoryVal === 'all') || (ev.category.toLowerCase() === categoryVal.toLowerCase());
+                const matchesSponsor = (sponsorVal === 'all') || (ev.sponsorId === sponsorVal);
+                
+                const trainer = trainers.find(t => t.id === ev.trainerId) || {};
+                const sponsor = sponsors.find(s => s.id === ev.sponsorId) || {};
+
+                const matchesSearch = !searchVal || 
+                    ev.title.toLowerCase().includes(searchVal) ||
+                    ev.desc.toLowerCase().includes(searchVal) ||
+                    (trainer.name && trainer.name.toLowerCase().includes(searchVal)) ||
+                    (sponsor.name && sponsor.name.toLowerCase().includes(searchVal));
+
+                return matchesCategory && matchesSponsor && matchesSearch;
+            });
+
+            document.getElementById('results-count').innerText = `Showing ${filtered.length} of ${events.length} programs`;
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            filtered.forEach(ev => {
+                const trainer = trainers.find(t => t.id === ev.trainerId) || { name: 'Faculty Speaker', title: '', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250' };
+                const sponsor = sponsors.find(s => s.id === ev.sponsorId) || { name: 'Faculty Sponsored', logo: 'FH', tier: 'Partner' };
+
+                let catBadgeClass = 'bg-slate-100 text-slate-700';
+                if(ev.category === 'Internship') catBadgeClass = 'bg-amber-100 text-amber-800 border border-amber-200';
+                if(ev.category === 'Workshop') catBadgeClass = 'bg-indigo-100 text-indigo-800 border border-indigo-200';
+                if(ev.category === 'Training') catBadgeClass = 'bg-emerald-100 text-emerald-800 border border-emerald-200';
+                if(ev.category === 'Symposium') catBadgeClass = 'bg-purple-100 text-purple-800 border border-purple-200';
+                if(ev.category === 'Hackathon') catBadgeClass = 'bg-rose-100 text-rose-800 border border-rose-200';
+
+                const cardHtml = `
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-200 flex flex-col justify-between overflow-hidden group">
+                        <div class="p-5">
+                            <!-- Header Badges -->
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${catBadgeClass}">
+                                    ${ev.category === 'Internship' ? '<i class="fa-solid fa-briefcase mr-1"></i>' : ''}
+                                    ${ev.category}
+                                </span>
+                                <span class="text-[11px] font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md flex items-center gap-1">
+                                    <i class="fa-solid fa-building text-slate-400"></i> ${sponsor.name}
+                                </span>
+                            </div>
+
+                            <!-- Title -->
+                            <h3 onclick="openEventDetails('${ev.id}')" class="text-base font-bold text-slate-900 group-hover:text-brand-600 transition cursor-pointer line-clamp-2">
+                                ${ev.title}
+                            </h3>
+
+                            <!-- Meta Details -->
+                            <div class="mt-3 space-y-1.5 text-xs text-slate-600">
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-regular fa-calendar text-brand-500 w-4"></i>
+                                    <span>${ev.date}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-regular fa-clock text-brand-500 w-4"></i>
+                                    <span>${ev.time}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-location-dot text-brand-500 w-4"></i>
+                                    <span class="truncate">${ev.location}</span>
+                                </div>
+                            </div>
+
+                            <p class="mt-3 text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                                ${ev.desc}
+                            </p>
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                            <!-- Trainer Avatar trigger -->
+                            <div onclick="openTrainerProfile('${trainer.id}')" class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition" title="View Trainer Profile">
+                                <img src="${trainer.avatar}" class="w-7 h-7 rounded-full object-cover border border-slate-300" alt="${trainer.name}">
+                                <span class="text-xs font-semibold text-slate-700 truncate max-w-[110px]">${trainer.name}</span>
+                            </div>
+
+                            <!-- Action Button -->
+                            <button onclick="openEventDetails('${ev.id}')" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-brand-600 text-white text-xs font-semibold transition">
+                                Details <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += cardHtml;
+            });
+        }
+
+        function applyFilters() {
+            renderEvents();
+        }
+
+        function filterByCategory(cat) {
+            document.getElementById('category-select').value = cat;
+            
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('active', 'bg-brand-50', 'text-brand-600');
+                btn.classList.add('text-slate-600');
+            });
+
+            const activeBtn = document.getElementById(`nav-${cat.toLowerCase()}`);
+            if(activeBtn) {
+                activeBtn.classList.add('active', 'bg-brand-50', 'text-brand-600');
+                activeBtn.classList.remove('text-slate-600');
+            }
+
+            applyFilters();
+        }
+
+        function setSearchQuery(query) {
+            document.getElementById('search-input').value = query;
+            applyFilters();
+        }
+
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('category-select').value = 'all';
+            document.getElementById('sponsor-select').value = 'all';
+            filterByCategory('all');
+        }
+
+        function openEventDetails(eventId) {
+            const ev = events.find(e => e.id === eventId);
+            if (!ev) return;
+
+            currentModalEvent = ev;
+            const trainer = trainers.find(t => t.id === ev.trainerId) || {};
+            const sponsor = sponsors.find(s => s.id === ev.sponsorId) || {};
+
+            document.getElementById('modal-event-title').innerText = ev.title;
+            document.getElementById('modal-category-badge').innerText = ev.category;
+            document.getElementById('modal-event-date').innerHTML = `<i class="fa-regular fa-calendar mr-1 text-brand-400"></i> ${ev.date}`;
+            document.getElementById('modal-event-time').innerHTML = `<i class="fa-regular fa-clock mr-1 text-brand-400"></i> ${ev.time}`;
+            document.getElementById('modal-event-location').innerHTML = `<i class="fa-solid fa-location-dot mr-1 text-brand-400"></i> ${ev.location}`;
+            
+            // Sponsor
+            document.getElementById('modal-sponsor-logo').innerText = sponsor.logo || 'SP';
+            document.getElementById('modal-sponsor-name').innerText = sponsor.name || 'Faculty Sponsored';
+            document.getElementById('modal-sponsor-tier').innerText = sponsor.tier || 'Academic Partner';
+            document.getElementById('modal-sponsor-btn').onclick = () => { closeModal('event-modal'); openSponsorsHub(); };
+
+            // Content
+            document.getElementById('modal-event-desc').innerText = ev.desc;
+            
+            // Highlights list
+            const highlightsUl = document.getElementById('modal-event-highlights');
+            highlightsUl.innerHTML = '';
+            (ev.highlights || ['Hands-on workshop labs', 'Industry recognized certification']).forEach(item => {
+                highlightsUl.innerHTML += `<li>${item}</li>`;
+            });
+
+            document.getElementById('modal-event-perks').innerText = ev.perks || 'Open to all enrolled faculty students and members.';
+
+            // Trainer info
+            document.getElementById('modal-trainer-avatar').src = trainer.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250';
+            document.getElementById('modal-trainer-name').innerText = trainer.name || 'Faculty Instructor';
+            document.getElementById('modal-trainer-role').innerText = trainer.title || 'Faculty Member';
+            document.getElementById('modal-trainer-btn').onclick = () => { closeModal('event-modal'); openTrainerProfile(trainer.id); };
+
+            // Registration Link
+            const regBtn = document.getElementById('modal-register-btn');
+            regBtn.href = ev.regUrl || '#';
+
+            openModal('event-modal');
+        }
+
+        function openTrainerProfile(trainerId) {
+            const trainer = trainers.find(t => t.id === trainerId);
+            if (!trainer) return;
+
+            document.getElementById('trainer-bio-avatar').src = trainer.avatar;
+            document.getElementById('trainer-bio-name').innerText = trainer.name;
+            document.getElementById('trainer-bio-title').innerText = trainer.title;
+            document.getElementById('trainer-bio-org').innerText = trainer.organization;
+            document.getElementById('trainer-bio-text').innerText = trainer.bio;
+
+            const socialsContainer = document.getElementById('trainer-bio-socials');
+            socialsContainer.innerHTML = '';
+            if (trainer.socials) {
+                if (trainer.socials.linkedin) {
+                    socialsContainer.innerHTML += `<a href="${trainer.socials.linkedin}" target="_blank" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-brand-600 hover:text-white text-slate-600 flex items-center justify-center transition"><i class="fa-brands fa-linkedin-in"></i></a>`;
+                }
+                if (trainer.socials.github) {
+                    socialsContainer.innerHTML += `<a href="${trainer.socials.github}" target="_blank" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-600 flex items-center justify-center transition"><i class="fa-brands fa-github"></i></a>`;
+                }
+                if (trainer.socials.twitter) {
+                    socialsContainer.innerHTML += `<a href="${trainer.socials.twitter}" target="_blank" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-sky-500 hover:text-white text-slate-600 flex items-center justify-center transition"><i class="fa-brands fa-x-twitter"></i></a>`;
+                }
+                if (trainer.socials.website) {
+                    socialsContainer.innerHTML += `<a href="${trainer.socials.website}" target="_blank" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-600 flex items-center justify-center transition"><i class="fa-solid fa-globe"></i></a>`;
+                }
+            }
+
+            const skillsContainer = document.getElementById('trainer-bio-skills');
+            skillsContainer.innerHTML = '';
+            (trainer.skills || []).forEach(sk => {
+                skillsContainer.innerHTML += `<span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 text-[10px] font-semibold">${sk}</span>`;
+            });
+
+            openModal('trainer-modal');
+        }
+
+        function openTrainersDirectory() {
+            const container = document.getElementById('trainers-list-grid');
+            container.innerHTML = '';
+
+            trainers.forEach(t => {
+                const html = `
+                    <div class="p-4 rounded-xl border border-slate-200 bg-white flex items-start gap-3 hover:border-brand-300 transition">
+                        <img src="${t.avatar}" class="w-14 h-14 rounded-full object-cover border border-slate-200 shrink-0" alt="${t.name}">
+                        <div class="flex-grow min-w-0">
+                            <h4 class="font-bold text-slate-800 text-sm truncate">${t.name}</h4>
+                            <p class="text-xs text-brand-600 font-medium truncate">${t.title}</p>
+                            <p class="text-[11px] text-slate-500 mt-0.5">${t.organization}</p>
+                            
+                            <div class="mt-3 flex items-center justify-between">
+                                <div class="flex gap-1.5">
+                                    ${t.socials?.linkedin ? `<a href="${t.socials.linkedin}" target="_blank" class="text-slate-400 hover:text-brand-600 text-xs"><i class="fa-brands fa-linkedin"></i></a>` : ''}
+                                    ${t.socials?.github ? `<a href="${t.socials.github}" target="_blank" class="text-slate-400 hover:text-slate-900 text-xs"><i class="fa-brands fa-github"></i></a>` : ''}
+                                </div>
+                                <button onclick="closeModal('trainers-directory-modal'); openTrainerProfile('${t.id}');" class="text-xs font-semibold text-brand-600 hover:underline">Full Bio &rarr;</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+
+            openModal('trainers-directory-modal');
+        }
+
+        function openSponsorsHub() {
+            const container = document.getElementById('sponsors-list-grid');
+            container.innerHTML = '';
+
+            sponsors.forEach(s => {
+                const sponsoredProgramsCount = events.filter(e => e.sponsorId === s.id).length;
+
+                const html = `
+                    <div class="p-5 rounded-2xl border border-slate-200 bg-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 rounded-xl bg-slate-900 text-white font-extrabold text-xl flex items-center justify-center shrink-0 shadow-md">
+                                ${s.logo}
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-bold text-slate-900 text-base">${s.name}</h4>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">${s.tier}</span>
+                                </div>
+                                <p class="text-xs text-slate-600 mt-1 max-w-md">${s.description}</p>
+                                <div class="flex items-center gap-4 mt-2 text-[11px] text-slate-500 font-medium">
+                                    <span><i class="fa-solid fa-briefcase text-emerald-600 mr-1"></i> ${s.internshipsOffered} Internship Openings</span>
+                                    <span><i class="fa-solid fa-calendar text-indigo-600 mr-1"></i> ${sponsoredProgramsCount} Hosted Events</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="closeModal('sponsors-modal'); openSponsorDetail('${s.id}');" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition shrink-0 self-end sm:self-center">
+                            Company Profile & Socials <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i>
+                        </button>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+
+            openModal('sponsors-modal');
+        }
+
+        function populateSponsorDropdowns() {
+            const selectFilter = document.getElementById('sponsor-select');
+            const selectForm = document.getElementById('form-sponsor');
+            
+            selectFilter.innerHTML = '<option value="all">All Sponsors</option>';
+            selectForm.innerHTML = '';
+
+            sponsors.forEach(s => {
+                selectFilter.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+                selectForm.innerHTML += `<option value="${s.id}">${s.name} (${s.tier})</option>`;
+            });
+        }
+
+        function populateTrainerDropdowns() {
+            const selectForm = document.getElementById('form-trainer');
+            selectForm.innerHTML = '';
+
+            trainers.forEach(t => {
+                selectForm.innerHTML += `<option value="${t.id}">${t.name} - ${t.organization}</option>`;
+            });
+        }
+
+        function openAddEventModal() {
+            openModal('add-event-modal');
+        }
+
+        function handleCreateEvent(e) {
+            e.preventDefault();
+            
+            const newEvent = {
+                id: 'ev_' + Date.now(),
+                title: document.getElementById('form-title').value,
+                category: document.getElementById('form-category').value,
+                sponsorId: document.getElementById('form-sponsor').value,
+                date: document.getElementById('form-date').value,
+                time: document.getElementById('form-time').value,
+                location: document.getElementById('form-location').value,
+                trainerId: document.getElementById('form-trainer').value,
+                desc: document.getElementById('form-desc').value,
+                regUrl: document.getElementById('form-link').value || 'https://forms.google.com',
+                highlights: ['Certificate of completion provided', 'Industry networking session'],
+                perks: 'Open to enrolled faculty students and academic members.'
+            };
+
+            events.unshift(newEvent);
+            saveState();
+            renderEvents();
+            closeModal('add-event-modal');
+            document.getElementById('add-event-form').reset();
+
+            showToast('New program published successfully!');
+        }
+
+        function downloadICS() {
+            if (!currentModalEvent) return;
+
+            const icsData = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Faculty EventHub//EN
+BEGIN:VEVENT
+SUMMARY:${currentModalEvent.title}
+DESCRIPTION:${currentModalEvent.desc}
+LOCATION:${currentModalEvent.location}
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR`;
+
+            const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.setAttribute('download', `${currentModalEvent.title.replace(/\s+/g, '_')}.ics`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast('.ICS Calendar invite generated!');
+        }
+
+        function exportEventsJSON() {
+            const exportData = {
+                events: events,
+                trainers: trainers,
+                sponsors: sponsors,
+                podcasts: podcasts
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "events.json");
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+
+            showToast('Exported events.json dataset!');
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
